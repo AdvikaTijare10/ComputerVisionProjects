@@ -1,7 +1,7 @@
 import cv2
 import os
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 image_path=os.path.join('.','data','scenery.jpg')
 image=cv2.imread(image_path)
