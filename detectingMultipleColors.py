@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from PIL import Image
+
 
 #hsv-> hue (wht color), saturation(how strong) , value(how bright)
 def get_limits(color):
@@ -17,8 +17,10 @@ def get_limits(color):
 
 
 cap = cv2.VideoCapture(0)
-
-blue = [255, 0, 0]   # BGR for blue
+colors={
+    "blue":[255,0,0],
+    "green":[0,255,0]
+}
 
 while True:
     ret, frame = cap.read()
@@ -30,22 +32,27 @@ while True:
 
     hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    lowerLimit, upperLimit = get_limits(blue)
+    for name, color in colors.items():
 
-    mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
+        lowerLimit, upperLimit = get_limits(color)
+
+        mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)  #only the pixel values in this range are shown white
+    ## detects only 1 blue object crtcly else draws a bounding box around all the blue objects in frame
     # mask_ = Image.fromarray(mask)
     # bbox =mask_.getbbox()  # Get bounding box of the detected area
     # if bbox is not None:
     #     x1 , y1 , x2 , y2 =bbox
     #     cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),5)
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    #each contour corresponds to one blue object
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    for cnt in contours:
-        area = cv2.contourArea(cnt)
+        for cnt in contours:
+         area = cv2.contourArea(cnt)
 
-        if area > 500:   # ignore small noise
+         if area > 500:   # ignore small noise
             x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)  # frame, bottom left corner, top right corner, color, thickness
+            cv2.putText(frame,name,(x,y-10),cv2.FONT_HERSHEY_SIMPLEX,0.6,(0,255,0),2)
     #  show both windows
     #cv2.imshow("Webcam", frame)
     cv2.imshow("Webcam", frame)
