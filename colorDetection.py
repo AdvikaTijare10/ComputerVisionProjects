@@ -32,12 +32,14 @@ while True:
 
     lowerLimit, upperLimit = get_limits(blue)
 
-    mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
+    mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)  #only the pixel values in this range are shown white
+    ## detects only 1 blue object crtcly else draws a bounding box around all the blue objects in frame
     # mask_ = Image.fromarray(mask)
     # bbox =mask_.getbbox()  # Get bounding box of the detected area
     # if bbox is not None:
     #     x1 , y1 , x2 , y2 =bbox
     #     cv2.rectangle(frame,(x1,y1),(x2,y2),(0,255,0),5)
+    #each contour corresponds to one blue object
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for cnt in contours:
@@ -45,7 +47,7 @@ while True:
 
         if area > 500:   # ignore small noise
             x, y, w, h = cv2.boundingRect(cnt)
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 3)  # frame, bottom left corner, top right corner, color, thickness
     #  show both windows
     #cv2.imshow("Webcam", frame)
     cv2.imshow("Webcam", frame)
